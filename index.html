@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="./csv.js"></script>
+    <script src="./underscore.js"></script>
+    <style>
+      div.card {
+        margin: 5px;
+        padding: 5px;
+        padding-left: 50px;
+        border: 1px solid black;
+      }
+      div.no-pb {
+        page-break-inside: avoid;
+      }
+      .d-none {
+        display: none;
+      }
+    </style>
+
+    <script>
+      _.templateSettings = {
+        interpolate: /\{\{(.+?)\}\}/g
+      };
+
+      function generate(){
+        var numCols = parseInt($("input[name=cols]:checked").val()),
+          template = _.template($("textarea#template").val()),
+          delimType = $("input[name=delim]:checked").val(),
+          delimChar = delimType || $("input[name=delim-other]").val(),
+          colClass = "col-xs-" + parseInt(12/numCols),
+          options = {
+            "csvddfVersion": 1.2,
+            "delimiter": delimChar,
+            "doubleQuote": true,
+            "lineTerminator": "\n",
+            "quoteChar": "\"",
+            "skipInitialSpace": true,
+            "header": false,
+            "commentChar": "#"
+          };
+
+        var data = CSV.parse($("textarea#csv-data").val(), options),
+          output = '';
+        _.each(data, function(row, i){
+          if(i%numCols == 0) output += '<div class="row no-pb">';
+          output += '<div class="' + colClass + '">' + template({row: row, i: i}) + '</div>';
+          if(i%numCols == numCols-1) output += '</div>';
+        })
+
+        $("#output-container").html(output);
+      }
+
+      function generateCardHtml(template, row, i){
+        return _.template(template)({row: row, i: i});
+      }
+
+      function toggleControl(){
+        $("#control").toggleClass('d-none')
+      }
+
+    </script>
+  </head>
+  <body>
+    <div class="well" id="control" style="margin-bottom: 0px;">
+      <h2>カードジェネレーター</h2>
+      <p>TSV/CSVからカードを簡単に作成します</p>
+
+      <form class="form">
+        <div class="form-group">
+          <label>テンプレート</label>
+<textarea id="template" class="form-control" placeholder="テンプレート" rows="1">
+<div class="card"> <h4>{{ i+1 }}. {{ row[0] }}</h4> <p>{{ row.slice(1).join('<br/>') }}</p> </div>
+</textarea>
+        </div>
+        <div class="form-group">
+          <label>データ</label>
+<textarea id="csv-data" class="form-control" placeholder="CSV形式でデータを入れてください" rows="8">
+オープンであれ	Be Open
+技術志向であれ	Be Technology Oriented
+エンドユーザーファースト	Be End User First
+推測より計測	Measurement Over Conjecture
+LEANに実行する	Running Lean
+</textarea>
+        </div>
+
+        <div class="form-group">
+          <label> 列数 </label>
+          <div>
+            <label class="radio-inline"> <input type="radio" name="cols" value="1"> 1列 </label>
+            <label class="radio-inline"> <input type="radio" name="cols" value="2" checked> 2列 </label>
+            <label class="radio-inline"> <input type="radio" name="cols" value="3"> 3列 </label>
+            <label class="radio-inline"> <input type="radio" name="cols" value="4"> 4列 </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label> 区切り文字 </label>
+          <div>
+            <label class="radio-inline"> <input type="radio" name="delim" value="&#9;" checked> タブ </label>
+            <label class="radio-inline"> <input type="radio" name="delim" value=","> カンマ </label>
+            <label class="radio-inline"> <input type="radio" name="delim" value=""> その他 </label>
+            <input type="text" name="delim-other" value=""/>
+          </div>
+        </div>
+
+        <div class="form-group">
+					<div class="btn-group">
+          <input type="button" value="作成" class="btn btn-default" onclick="generate();"/>
+          <input type="button" value="印刷" class="btn btn-primary" onclick="generate(); toggleControl(); window.print()"/>
+					</div>
+        </div>
+      </form>
+    </div>
+
+    <center style="margin-bottom: 10px;">
+      <a class="label label-sm label-default" href="#" role="button" onclick="toggleControl();">メニュー表示/非表示</a>
+    </center>
+
+    <div id="output-container"> </div>
+  </body>
+</html>
