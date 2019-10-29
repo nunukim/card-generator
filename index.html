@@ -103,7 +103,7 @@ LEANに実行する	Running Lean
             <label class="radio-inline"> <input type="radio" name="delim" value="&#9;" checked> タブ </label>
             <label class="radio-inline"> <input type="radio" name="delim" value=","> カンマ </label>
             <label class="radio-inline"> <input type="radio" name="delim" value=""> その他 </label>
-            <input type="text" name="delim-other" value=""/>
+            <input type="text" name="delim-other" value="" size="3"/>
           </div>
         </div>
 
@@ -112,6 +112,7 @@ LEANに実行する	Running Lean
           <input type="button" value="作成" class="btn btn-default" onclick="generate();"/>
           <input type="button" value="印刷" class="btn btn-primary" onclick="generate(); toggleControl(); window.print()"/>
 					</div>
+          <p class="help-block"> <strong>片面</strong>印刷に設定してください </p>
         </div>
       </form>
     </div>
